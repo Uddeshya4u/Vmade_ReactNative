@@ -7,9 +7,12 @@ import { Link, Redirect, router } from 'expo-router';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { images } from '../constants';
 import CustomButton from '../Components/CustomButton';
+import { userGlobalContext } from '../context/GlobalsProvider';
 
 export default function App() {
+  const { isLoggedIn, isLoading } = userGlobalContext();
   const handlePress = () => router.push('./sign_in');
+  if (!isLoading && isLoggedIn) return <Redirect href='/home' />;
   return (
     <>
       {/* // Using safe area view so the view takes the size of any devices (for

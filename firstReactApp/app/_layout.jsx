@@ -2,6 +2,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import React, { useEffect } from 'react';
 import { SplashScreen, Stack } from 'expo-router';
 import { useFonts } from 'expo-font';
+import GlobalProvider from '../context/GlobalsProvider';
 
 SplashScreen.preventAutoHideAsync();
 const RootLayout = () => {
@@ -29,12 +30,14 @@ const RootLayout = () => {
   }
 
   return (
-    <Stack>
-      <Stack.Screen name='index' options={{ headerShown: false }} /> //To hide
-      the screen name from top
-      <Stack.Screen name='(auth)' options={{ headerShown: false }} />
-      <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
-    </Stack>
+    <GlobalProvider>
+      <Stack>
+        <Stack.Screen name='index' options={{ headerShown: false }} /> //To hide
+        the screen name from top
+        <Stack.Screen name='(auth)' options={{ headerShown: false }} />
+        <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
+      </Stack>
+    </GlobalProvider>
   );
 };
 
