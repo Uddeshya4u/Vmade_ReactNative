@@ -83,3 +83,27 @@ export const getCurrentUser = async () => {
     console.log(error);
   }
 };
+
+export const getAllPosts = async () => {
+  try {
+    const posts = await dbs.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.videosCollectionId
+    );
+    return posts.documents;
+  } catch (error) {
+    console.log(error);
+  }
+};
+export const getLatestlPosts = async () => {
+  try {
+    const posts = await dbs.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.videosCollectionId,
+      [Query.orderDesc('$createdAt', Query.limit(5))]
+    );
+    return posts.documents;
+  } catch (error) {
+    console.log(error);
+  }
+};
