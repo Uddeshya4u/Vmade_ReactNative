@@ -7,7 +7,8 @@ import {
   Image,
 } from 'react-native';
 import * as Animatable from 'react-native-animatable';
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
+import { Video, ResizeMode } from 'expo-av';
 import { icons } from '../constants';
 
 const Trending = ({ posts }) => {
@@ -54,6 +55,8 @@ const zoomOut = {
 
 const TrendingANimatableItem = ({ activeItem, item }) => {
   const [play, setPlay] = useState(false);
+  const video = useRef(null);
+  const [status, setStatus] = React.useState({});
   return (
     <Animatable.View
       className='mr-5'
@@ -61,7 +64,22 @@ const TrendingANimatableItem = ({ activeItem, item }) => {
       duration={500}
     >
       {play ? (
-        <Text className='text-white'>Playing</Text>
+        <Video
+          ref={video}
+          source={{
+            uri: 'https://d23dyxeqlo5psv.cloudfront.net/big_buck_bunny.mp4',
+          }}
+          className='w-52 h-72 rounded-[35px] mt-3 bg-white/10'
+          resizeMode={ResizeMode.CONTAIN}
+          shouldPlay
+          useNativeControls
+          onPlaybackStatusUpdate={(status) => {
+            setStatus(() => status);
+            if (status.didJustFinish) {
+              setPlay(false);
+            }
+          }}
+        />
       ) : (
         <TouchableOpacity
           className='relative justify-center items-center'

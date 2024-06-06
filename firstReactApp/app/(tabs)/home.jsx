@@ -58,7 +58,7 @@ const home = () => {
                 </View>
               </View>
               <SearchInput />
-              <View className='w-full flex-1 pt-5 pb-8'>
+              <View className='w-full flex-1 pt-5 pb-10'>
                 <Text className='text-gray-100 text-lg font-pregular mb-3'>
                   Trending Videos
                 </Text>
