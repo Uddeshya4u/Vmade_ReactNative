@@ -107,3 +107,16 @@ export const getLatestlPosts = async () => {
     console.log(error);
   }
 };
+
+export const getSearchedPosts = async (query) => {
+  try {
+    const posts = await dbs.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.videosCollectionId,
+      [Query.search('title', query)]
+    );
+    return posts.documents;
+  } catch (error) {
+    console.log(error);
+  }
+};

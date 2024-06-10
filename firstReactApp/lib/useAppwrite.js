@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Alert } from 'react-native';
 //Custom hook to fetch different data from appwrite using cb func
 export const useAppWrite = (callbackFunction) => {
   const [data, setData] = useState([]);
