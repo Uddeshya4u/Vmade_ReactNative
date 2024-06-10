@@ -15,11 +15,13 @@ import EmptyState from '../../Components/EmptyState';
 import { getAllPosts, getLatestlPosts } from '../../lib/appwrite';
 import { useAppWrite } from '../../lib/useAppwrite';
 import VideoCard from '../../Components/VideoCard';
+import { userGlobalContext } from '../../context/GlobalsProvider';
 
 const home = () => {
   const [refreshing, setRefreshing] = useState(false);
   const { data: posts, isLoading, reFetchData } = useAppWrite(getAllPosts);
   const { data: latestPosts } = useAppWrite(getLatestlPosts);
+  const { user } = userGlobalContext();
 
   //To fetch new video on pull down to refresh
   const onRefresh = async () => {
@@ -46,7 +48,7 @@ const home = () => {
                     Welcome Back
                   </Text>
                   <Text className='font-psemibold text-2xl text-white'>
-                    Uddeshya
+                    {user.userName || 'User'}
                   </Text>
                 </View>
                 <View className='mt-1.5'>
