@@ -5,6 +5,7 @@ import {
   Avatars,
   Databases,
   Query,
+  Storage,
 } from 'react-native-appwrite';
 
 export const appwriteConfig = {
@@ -27,6 +28,8 @@ client
 const account = new Account(client);
 const avatars = new Avatars(client);
 const dbs = new Databases(client);
+const storage = new Storage(client);
+
 export const createUser = async (email, password, userName) => {
   try {
     const newAccount = await account.create(
@@ -139,5 +142,71 @@ export const signOut = async () => {
     return session;
   } catch (error) {
     throw Error(error);
+  }
+};
+
+export const createVideo = async (form) => {
+  try {
+    const [thumbnailUrl, videoUrl] = await Promise.all([
+      uploadFile(form.thumbnail, 'image'),
+      uploadFile(form.video, 'video'),
+    ]);
+
+    const newPost = await dbs.createDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.videosCollectionId,
+      ID.unique(),
+      {
+        title: form.title,
+        thumbnail: thumbnailUrl,
+        video: videoUrl,
+        prompt: form.prompt,
+        users: form.userId,
+      }
+    );
+    return newPost;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+export const uploadFile = async (file, type) => {
+  if (!file) return;
+  const { mimeType, ...rest } = file;
+  const asset = { type: mimeType, ...rest };
+  try {
+    const uploadedFile = await storage.createFile(
+      appwriteConfig.storageBucketId,
+      ID.unique(),
+      asset
+    );
+    const fileUrl = await getFilePreview(uploadedFile.$id, type);
+    return fileUrl;
+  } catch (error) {
+    throw new Error(error);
+  }
+};
+
+export const getFilePreview = async (fileId, fileType) => {
+  let fileUrl;
+  try {
+    if (fileType === 'video') {
+      fileUrl = storage.getFileView(appwriteConfig.storageBucketId, fileId);
+    } else if (fileType === 'image') {
+      fileUrl = storage.getFilePreview(
+        appwriteConfig.storageBucketId,
+        fileId,
+        2000,
+        2000,
+        'top',
+        100
+      );
+    } else {
+      throw new Error('Invalid File Type');
+    }
+    if (!fileUrl) Error(error);
+    return fileUrl;
+  } catch (error) {
+    throw new Error(error);
   }
 };
