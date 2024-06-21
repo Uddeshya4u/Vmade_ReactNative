@@ -3,6 +3,7 @@ import React, { useEffect } from 'react';
 import { SplashScreen, Stack } from 'expo-router';
 import { useFonts } from 'expo-font';
 import GlobalProvider from '../context/GlobalsProvider';
+import SavedPostsProvider from '../context/SavedPostsProvider';
 
 SplashScreen.preventAutoHideAsync();
 const RootLayout = () => {
@@ -31,13 +32,18 @@ const RootLayout = () => {
 
   return (
     <GlobalProvider>
-      <Stack>
-        <Stack.Screen name='index' options={{ headerShown: false }} /> //To hide
-        the screen name from top
-        <Stack.Screen name='(auth)' options={{ headerShown: false }} />
-        <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
-        <Stack.Screen name='search/[query]' options={{ headerShown: false }} />
-      </Stack>
+      <SavedPostsProvider>
+        <Stack>
+          <Stack.Screen name='index' options={{ headerShown: false }} /> //To
+          hide the screen name from top
+          <Stack.Screen name='(auth)' options={{ headerShown: false }} />
+          <Stack.Screen name='(tabs)' options={{ headerShown: false }} />
+          <Stack.Screen
+            name='search/[query]'
+            options={{ headerShown: false }}
+          />
+        </Stack>
+      </SavedPostsProvider>
     </GlobalProvider>
   );
 };

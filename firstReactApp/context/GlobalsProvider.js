@@ -1,6 +1,5 @@
 import { createContext, useContext, useState, useEffect } from 'react';
 import { getCurrentUser } from '../lib/appwrite';
-import { Alert } from 'react-native';
 
 const GLobalContext = createContext();
 //custom hook to use a global context

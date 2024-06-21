@@ -1,19 +1,69 @@
-import { View, Text, Image, TouchableOpacity } from 'react-native';
-import React, { useState, useRef } from 'react';
+import {
+  View,
+  Text,
+  Image,
+  TouchableOpacity,
+  Button,
+  Pressable,
+  Alert,
+} from 'react-native';
+import React, { useState, useRef, useEffect } from 'react';
 import { icons } from '../constants';
 import { Video, ResizeMode } from 'expo-av';
-
+import { userGlobalContext } from '../context/GlobalsProvider';
+import { saveUserPost, removeUserPost } from '../lib/appwrite';
+import { useSavedPostsContext } from '../context/SavedPostsProvider';
 const VideoCard = ({
   video: {
+    $id: id,
     title,
     thumbnail,
     video,
     users: { userName, avatar },
   },
 }) => {
+  const { savedPosts, setSavedPosts } = useSavedPostsContext();
   const [play, setPlay] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
   const thisVideo = useRef(null);
-  const [status, setStatus] = React.useState({});
+  const [status, setStatus] = useState({});
+  const { user } = userGlobalContext();
+  const addVideoToBookMark = async () => {
+    try {
+      if (isLiked) {
+        await removePost();
+        const updatedArray = savedPosts.filter((post) => post != id);
+        setSavedPosts(updatedArray);
+      } else {
+        await savePost();
+        setSavedPosts((prev) => [...prev, id]);
+      }
+      setIsLiked((prev) => !prev);
+    } catch (error) {
+      Alert.alert('Failed to save post', error.message);
+    }
+  };
+  const savePost = async () => {
+    try {
+      await saveUserPost(user.$id, id);
+    } catch (error) {
+      console.error('Failed to save post for user: ', user.$id);
+    }
+  };
+  const removePost = async () => {
+    try {
+      await removeUserPost(user.$id, id);
+    } catch (error) {
+      console.error('Failed to save post for user: ', user.$id);
+    }
+  };
+  useEffect(() => {
+    if (savedPosts.indexOf(id) == -1) {
+      setIsLiked(false);
+    } else {
+      setIsLiked(true);
+    }
+  }, [savedPosts]);
   return (
     <View className='flex-col items-center px-4 mb-14'>
       <View className='flex-row gap-3 items-start'>
@@ -41,7 +91,13 @@ const VideoCard = ({
           </View>
         </View>
         <View className='pt-2'>
-          <Image source={icons.menu} className='w-5 h-5' resizeMode='contain' />
+          <Pressable onPress={addVideoToBookMark}>
+            <Image
+              source={isLiked ? icons.heartFilled : icons.heart}
+              className='w-8 h-8'
+              resizeMode='contain'
+            />
+          </Pressable>
         </View>
       </View>
       {play ? (

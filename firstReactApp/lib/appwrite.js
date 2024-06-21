@@ -1,3 +1,4 @@
+import { useEffect } from 'react';
 import {
   Client,
   Account,
@@ -7,7 +8,7 @@ import {
   Query,
   Storage,
 } from 'react-native-appwrite';
-
+import { useSavedPostsContext } from '../context/SavedPostsProvider';
 export const appwriteConfig = {
   endpoint: 'https://cloud.appwrite.io/v1',
   platform: 'com.somecompany.V_made_RNA',
@@ -16,6 +17,7 @@ export const appwriteConfig = {
   userCollectionId: '6654d3e60025918b8e1b',
   videosCollectionId: '6654d415001fee3c53e2',
   storageBucketId: '6654d6d80022b2de1028',
+  savedPostsCollectionId: '666ebc4b00073f4334aa',
 };
 
 const client = new Client();
@@ -91,7 +93,8 @@ export const getAllPosts = async () => {
   try {
     const posts = await dbs.listDocuments(
       appwriteConfig.databaseId,
-      appwriteConfig.videosCollectionId
+      appwriteConfig.videosCollectionId,
+      [Query.orderDesc('$createdAt')]
     );
     return posts.documents;
   } catch (error) {
@@ -208,5 +211,60 @@ export const getFilePreview = async (fileId, fileType) => {
     return fileUrl;
   } catch (error) {
     throw new Error(error);
+  }
+};
+
+export const saveUserPost = async (userId, videoId) => {
+  try {
+    const result = await dbs.createDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.savedPostsCollectionId,
+      ID.unique(),
+      { userId: userId, videoId: videoId }
+    );
+  } catch (error) {
+    console.error('Error while Saving a pots', error.message);
+  }
+};
+
+export const removeUserPost = async (userId, videoId) => {
+  try {
+    const documentToBeDeleted = await dbs.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.savedPostsCollectionId,
+      [Query.equal('userId', userId), Query.equal('videoId', videoId)]
+    );
+    await dbs.deleteDocument(
+      appwriteConfig.databaseId,
+      appwriteConfig.savedPostsCollectionId,
+      documentToBeDeleted.documents[0].$id.toString()
+    );
+  } catch (error) {
+    console.error('Error while Deleting a pots', error.message);
+  }
+};
+
+export const getAllSavedPosts = async (userId) => {
+  try {
+    const savedPosts = await dbs.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.savedPostsCollectionId,
+      [Query.equal('userId', userId)]
+    );
+    return savedPosts.documents;
+  } catch (error) {
+    console.error('Error while fetching saved posts', error.message);
+  }
+};
+export const getVideos = async (videoId) => {
+  try {
+    const video = await dbs.listDocuments(
+      appwriteConfig.databaseId,
+      appwriteConfig.videosCollectionId,
+      [Query.equal('$id', videoId)]
+    );
+    return video.documents[0];
+  } catch (error) {
+    console.error('Error while fetching saved posts', error.message);
   }
 };
